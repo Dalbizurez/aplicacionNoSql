@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtCore
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime
@@ -11,23 +11,27 @@ db = client["articulos"]
 coleccion_articulo = db["articulo"]
 
 class InsertDialog(QtWidgets.QDialog, Ui_Dialog):
+    articulo_guardado = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        
-       
         self.btn_guardar_articulo.clicked.connect(self.insertar_articulo)
-
-    def insertar_articulo(self):
+        
+    def obtener_datos(self):
         titulo = self.txt_titulo.text()
         contenido = self.txtContenido.toPlainText()
+        return titulo, contenido
+
+    def insertar_articulo(self):
+        titulo, contenido = self.obtener_datos()
         
         articulo = {
             "_id": ObjectId(), 
             "titulo": titulo,
             "contenido": contenido,
-            "fecha": datetime.now().strftime("%Y-%m-%d"),  
-            "comentarios": []  
+            "fecha": datetime.now().strftime("%Y-%m-%d"),
+            "comentarios": []
         }
 
         resultado = coleccion_articulo.insert_one(articulo)
@@ -35,6 +39,8 @@ class InsertDialog(QtWidgets.QDialog, Ui_Dialog):
         if resultado.inserted_id:
             print("Artículo insertado correctamente:", resultado.inserted_id)
             QtWidgets.QMessageBox.information(self, "Éxito", "El artículo ha sido guardado.")
+            self.articulo_guardado.emit()
+            self.accept()
         else:
             print("Error al insertar el artículo.")
             QtWidgets.QMessageBox.warning(self, "Error", "Hubo un problema al guardar el artículo.")
@@ -44,7 +50,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         
-        self.btn_articulo.clicked.connect(lambda:self.abrir_dialogo())
+        self.btn_articulo.clicked.connect(self.abrir_dialogo)
+        self.cargar_articulos()  # Cargar artículos al iniciar())
 
         self.insertDialog = InsertDialog()
         
@@ -57,25 +64,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def abrir_dialogo(self):
         dialogo = InsertDialog(self)
-        if dialogo.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            titulo, contenido = dialogo.obtener_datos()
-            self.insertar_articulo(titulo, contenido)
-            self.cargar_articulos() 
-
+        dialogo.articulo_guardado.connect(self.cargar_articulos)
+        dialogo.exec()
 
     def cargar_articulos(self):
-        self.tbl_articulos.clearContents()
-
-        articulos = db["articulo"].find()
+        self.tbl_articulos.setRowCount(0)
+        articulos = coleccion_articulo.find()
 
         for row_index, articulo in enumerate(articulos):
             self.tbl_articulos.insertRow(row_index)
-        
-            id_value = articulo.get("id", "N/A") 
+            id_value = articulo.get("id", "N/A")
             titulo_value = articulo.get("titulo", "Sin Título")
             contenido_value = articulo.get("contenido", "Sin Contenido")
             fecha_value = articulo.get("fecha", "Fecha No Disponible")
-        
+            
             self.tbl_articulos.setItem(row_index, 0, QtWidgets.QTableWidgetItem(id_value))
             self.tbl_articulos.setItem(row_index, 1, QtWidgets.QTableWidgetItem(titulo_value))
             self.tbl_articulos.setItem(row_index, 2, QtWidgets.QTableWidgetItem(contenido_value))
