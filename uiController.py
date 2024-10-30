@@ -51,14 +51,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         
         self.btn_articulo.clicked.connect(self.abrir_dialogo)
-        self.cargar_articulos()  # Cargar artículos al iniciar())
+        self.cargar_articulos()  
 
         self.insertDialog = InsertDialog()
         
         self.insertDialog.btn_guardar_articulo.clicked.connect(lambda:self.cargar_articulos)
 
-        self.tbl_articulos.setColumnCount(4)
-        self.tbl_articulos.setHorizontalHeaderLabels(["ID", "Título", "Contenido", "Fecha"])
+        self.tbl_articulos.setColumnCount(5)
+        self.tbl_articulos.setHorizontalHeaderLabels(["ID", "Título", "Contenido", "Fecha", "Nombre Administrador"]) 
 
         self.cargar_articulos()
 
@@ -77,11 +77,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             titulo_value = articulo.get("titulo", "Sin Título")
             contenido_value = articulo.get("contenido", "Sin Contenido")
             fecha_value = articulo.get("fecha", "Fecha No Disponible")
+            nombre_administrador_value = articulo.get("nombre_administrador", "Sin Administrador")  
             
+            # Insertar los valores en las celdas de la tabla
             self.tbl_articulos.setItem(row_index, 0, QtWidgets.QTableWidgetItem(id_value))
             self.tbl_articulos.setItem(row_index, 1, QtWidgets.QTableWidgetItem(titulo_value))
             self.tbl_articulos.setItem(row_index, 2, QtWidgets.QTableWidgetItem(contenido_value))
             self.tbl_articulos.setItem(row_index, 3, QtWidgets.QTableWidgetItem(fecha_value))
+            self.tbl_articulos.setItem(row_index, 4, QtWidgets.QTableWidgetItem(nombre_administrador_value))  
 
 def run():
     app = QtWidgets.QApplication([])
