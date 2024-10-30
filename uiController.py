@@ -48,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.insertDialog = InsertDialog()
         
-        self.insertDialog.btn_guardar_articulo.clicked.connect(lambda:self.cargar_articulos())
+        self.insertDialog.btn_guardar_articulo.clicked.connect(lambda:self.cargar_articulos)
 
         self.tbl_articulos.setColumnCount(4)
         self.tbl_articulos.setHorizontalHeaderLabels(["ID", "Título", "Contenido", "Fecha"])
