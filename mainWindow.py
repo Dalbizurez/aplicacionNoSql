@@ -8,8 +8,11 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+class Ui_MainWindow(QtWidgets.QMainWindow):  # Cambiamos la clase base a QMainWindow
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
 
-class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(670, 566)
@@ -107,3 +110,4 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_articulos), _translate("MainWindow", "Articulos"))
         self.btn_comentario.setText(_translate("MainWindow", "+"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_comentarios), _translate("MainWindow", "Comentarios"))
+
