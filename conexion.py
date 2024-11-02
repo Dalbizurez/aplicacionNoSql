@@ -19,3 +19,10 @@ try:
 except ConnectionFailure:
     print("Error: No se pudo conectar a MongoDB")
 
+
+def getUsuario(id_estudiante:str):
+    collection = db["estudiante"]
+    return collection.find_one({"id":id_estudiante})
+
+def getArticulos(id_estudiante:str):
+    return collection.find({"id_estudiante":id_estudiante})
